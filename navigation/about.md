@@ -100,15 +100,15 @@ Here is what I did at those places
 
 - 🏫 Went to Design 39 from TK to 5th Grade
 - 🏫 Moved to Oak Valley for middle school and stayed all three years 
-- 🏫 Started high school at Del Norte
+- 🏫 Started high school at Del Norte this year (2025)
 
 ### Culture, Family, and Fun
 
-Everything for me, as for many others, revolves around family and faith.
+My life revolves around family, sports and friends. 
 
-- My mother told me that I was Danish, English. and Irish, here is my researched [family tree]({{site.baseurl}}/images/about/familytree.png)
-- My family is pretty big as I have been married twice, my 1st wife passed away.  We have had 5 kids, 4 adopted by me, 1 biological.  Plus, there are three grandkids.  My name to my grandkids is Abuilito.
-- The gallery of pics has some of my family, fun, culture and faith memories.
+- My family that I live with consists of a little sister in 5th grade, and then my mom and dad. 
+- Me and my sister were born here but my parents orginate from India. 
+- The gallery of pics has some of my family, fun, and my culture. 
 
 <comment>
 Gallery of Pics, scroll to the right for more ...
