@@ -101,6 +101,8 @@ Here is what I did at those places
 - 🏫 Went to Design 39 from TK to 5th Grade
 - 🏫 Moved to Oak Valley for middle school and stayed all three years 
 - 🏫 Started high school at Del Norte this year (2025)
+- ⚽ I've played soccer since I was 3 and still do; My favorite activity
+- 💻🛡️ I joined cyberaegis in 7th grade and still continue doing it (3rd season now)
 
 ### Culture, Family, and Fun
 
