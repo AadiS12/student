@@ -1,71 +1,11 @@
 ---
-title: "Whack-a-Mole — playable game"
-date: 2025-12-13
-categories: [HTML, JavaScript]
----
-title: "Whack-a-Mole"
-date: 2025-12-13
-categories: [HTML, JavaScript]
----
 title: "Whack-a-Mole"
 date: 2025-12-13
 categories: [HTML, JavaScript]
 layout: post
 ---
 
-Redirecting to the playable game — if your browser does not redirect automatically, click <a href="/hacks/whackamole.html">here</a> to open the game.
-
-<meta http-equiv="refresh" content="0; url=/hacks/whackamole.html">
-
-class GoldenMole extends Mole{
-  constructor(hole){ super(hole,'gold'); this.points = 20; }
-  render(ctx,x,y,size){ ctx.fillStyle='gold'; ctx.beginPath(); ctx.arc(x,y,size*0.45,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#333'; ctx.fillText('★', x-6, y+6); }
-  onHit(game){ game.addScore(this.points*2); super.onHit(game); }
-}
-
-class PowerUp extends Entity{
-  constructor(hole){ super(hole,1000); }
-  render(ctx,x,y,size){ ctx.fillStyle='#ff6'; ctx.fillRect(x-size*0.35,y-size*0.35,size*0.7,size*0.7); }
-  onHit(game){ game.addScore(25); game.addLife(); super.onHit(game); }
-}
-
-class Hole{
-  constructor(x,y,size){ this.x=x; this.y=y; this.size=size; this.entity=null; }
-  render(ctx){ ctx.fillStyle='#443'; ctx.beginPath(); ctx.ellipse(this.x,this.y,this.size*0.48,this.size*0.28,0,0,Math.PI*2); ctx.fill(); if(this.entity) this.entity.render(ctx,this.x,this.y,this.size); }
-}
-
-class Game{
-  constructor(canvasId){
-    this.canvas = document.getElementById(canvasId); this.ctx = this.canvas.getContext('2d');
-    this.rows = 3; this.cols = 3; this.holes = []; this.score=0; this.lives=3; this.running=false; this.spawnTimer=0; this.spawnInterval=800; this.speedMultiplier=1;
-    this.high = parseInt(localStorage.getItem('whackHigh'))||0;
-    this.setupGrid(); this.bind(); this.updateUI(); this.loop = this.loop.bind(this);
-  }
-  setupGrid(){ const w=this.canvas.width, h=this.canvas.height; const size=Math.min(w,h)/this.rows; for(let r=0;r<this.rows;r++){ for(let c=0;c<this.cols;c++){ let x = (c+0.5)*size; let y=(r+0.5)*size; this.holes.push(new Hole(x,y,size)); } } }
-  bind(){ this.canvas.addEventListener('click', e=>{ const rect=this.canvas.getBoundingClientRect(); const mx=e.clientX-rect.left, my=e.clientY-rect.top; this.handleClick(mx,my); }); document.getElementById('startBtn').addEventListener('click', ()=>this.start()); }
-  start(){ this.score=0; this.lives=3; this.running=true; this.spawnTimer=0; this.spawnInterval=800; requestAnimationFrame(this.loop); this.updateUI(); }
-  end(){ this.running=false; localStorage.setItem('whackHigh', Math.max(this.high,this.score)); // save high
-    let arr = JSON.parse(localStorage.getItem('whackLast'))||[]; arr.unshift(this.score); arr = arr.slice(0,5); localStorage.setItem('whackLast', JSON.stringify(arr)); this.high = Math.max(this.high,this.score); this.updateUI(); alert('Game over — score: '+this.score); }
-  addScore(n){ this.score += n; if(this.score>this.high) this.high=this.score; this.updateUI(); }
-  addLife(){ this.lives++; this.updateUI(); }
-  speedUp(){ this.spawnInterval = Math.max(300, this.spawnInterval - 80); }
-  handleClick(mx,my){ for(const hole of this.holes){ if(hole.entity){ const s = hole.size/2; if(mx>=hole.x-s && mx<=hole.x+s && my>=hole.y-s && my<=hole.y+s){ hole.entity.onHit(this); return; } } } this.lives--; if(this.lives<=0) this.end(); this.updateUI(); }
-  spawnEntity(){ const empty = this.holes.filter(h=>!h.entity); if(empty.length===0) return; const hole = empty[Math.floor(Math.random()*empty.length)]; const r=Math.random(); if(r<0.80) hole.entity = new Mole(hole,'normal'); else if(r<0.95) hole.entity = new PowerUp(hole); else hole.entity = new GoldenMole(hole); }
-  update(dt){ for(const h of this.holes) if(h.entity) h.entity.update(dt,this); this.spawnTimer += dt; if(this.spawnTimer > this.spawnInterval){ this.spawnTimer =0; this.spawnEntity(); } }
-  render(){ const ctx=this.ctx; ctx.clearRect(0,0,this.canvas.width,this.canvas.height); for(const h of this.holes) h.render(ctx); }
-  loop(ts){ if(!this._last) this._last=ts; const dt = ts - this._last; this._last = ts; if(this.running){ this.update(dt); this.render(); requestAnimationFrame(this.loop); } }
-  updateUI(){ document.getElementById('score').textContent = this.score; document.getElementById('lives').textContent = this.lives; document.getElementById('high').textContent = this.high; }
-}
-
-// instantiate
-const game = new Game('gameCanvas');
-window._whack = game;
-</script>
-
-layout: post
----
-
-Below is a Whack-a-Mole game.
+Below is the playable Whack-a-Mole game embedded directly so the site will run the JavaScript.
 
 <style>
   /* Local styles for the embedded game */
@@ -83,63 +23,13 @@ Below is a Whack-a-Mole game.
 <canvas id="gameCanvas" width="480" height="480"></canvas>
 
 <script>
-// Minimal OOP Whack-a-Mole implementation (embedded in page)
-class Entity {
-  constructor(hole, lifetime=1500){ this.hole = hole; this.life = lifetime; this.spawnTime = Date.now(); }
-  update(dt, game){ if (Date.now() - this.spawnTime > this.life) this.expire(game); }
-  render(ctx,x,y,size){}
-  onHit(game){ this.expire(game); }
-  expire(game){ if (this.hole) this.hole.entity = null; }
-}
-
-class Mole extends Entity {
-  constructor(hole,type='normal'){ super(hole,1400); this.type=type; this.points = (type==='normal'?10:50); }
-  render(ctx,x,y,size){ ctx.fillStyle=(this.type==='normal'?'#6b3':'#36f'); ctx.beginPath(); ctx.arc(x,y,size*0.4,0,Math.PI*2); ctx.fill(); }
-  onHit(game){ game.addScore(this.points); if (this.type==='blue') game.speedUp(); super.onHit(game); }
-}
-
-class GoldenMole extends Mole{
-  constructor(hole){ super(hole,'gold'); this.points = 20; }
-  render(ctx,x,y,size){ ctx.fillStyle='gold'; ctx.beginPath(); ctx.arc(x,y,size*0.45,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#333'; ctx.fillText('★', x-6, y+6); }
-  onHit(game){ game.addScore(this.points*2); super.onHit(game); }
-}
-
-class PowerUp extends Entity{
-  constructor(hole){ super(hole,1000); }
-  render(ctx,x,y,size){ ctx.fillStyle='#ff6'; ctx.fillRect(x-size*0.35,y-size*0.35,size*0.7,size*0.7); }
-  onHit(game){ game.addScore(25); game.addLife(); super.onHit(game); }
-}
-
-class Hole{
-  constructor(x,y,size){ this.x=x; this.y=y; this.size=size; this.entity=null; }
-  render(ctx){ ctx.fillStyle='#443'; ctx.beginPath(); ctx.ellipse(this.x,this.y,this.size*0.48,this.size*0.28,0,0,Math.PI*2); ctx.fill(); if(this.entity) this.entity.render(ctx,this.x,this.y,this.size); }
-}
-
-class Game{
-  constructor(canvasId){
-    this.canvas = document.getElementById(canvasId); this.ctx = this.canvas.getContext('2d');
-    this.rows = 3; this.cols = 3; this.holes = []; this.score=0; this.lives=3; this.running=false; this.spawnTimer=0; this.spawnInterval=800; this.speedMultiplier=1;
-    this.high = parseInt(localStorage.getItem('whackHigh'))||0;
-    this.setupGrid(); this.bind(); this.updateUI(); this.loop = this.loop.bind(this);
-  }
-  setupGrid(){ const w=this.canvas.width, h=this.canvas.height; const size=Math.min(w,h)/this.rows; for(let r=0;r<this.rows;r++){ for(let c=0;c<this.cols;c++){ let x = (c+0.5)*size; let y=(r+0.5)*size; this.holes.push(new Hole(x,y,size)); } } }
-  bind(){ this.canvas.addEventListener('click', e=>{ const rect=this.canvas.getBoundingClientRect(); const mx=e.clientX-rect.left, my=e.clientY-rect.top; this.handleClick(mx,my); }); document.getElementById('startBtn').addEventListener('click', ()=>this.start()); }
-  start(){ this.score=0; this.lives=3; this.running=true; this.spawnTimer=0; this.spawnInterval=800; requestAnimationFrame(this.loop); this.updateUI(); }
-  end(){ this.running=false; localStorage.setItem('whackHigh', Math.max(this.high,this.score)); // save high
-    let arr = JSON.parse(localStorage.getItem('whackLast'))||[]; arr.unshift(this.score); arr = arr.slice(0,5); localStorage.setItem('whackLast', JSON.stringify(arr)); this.high = Math.max(this.high,this.score); this.updateUI(); alert('Game over — score: '+this.score); }
-  addScore(n){ this.score += n; if(this.score>this.high) this.high=this.score; this.updateUI(); }
-  addLife(){ this.lives++; this.updateUI(); }
-  speedUp(){ this.spawnInterval = Math.max(300, this.spawnInterval - 80); }
-  handleClick(mx,my){ for(const hole of this.holes){ if(hole.entity){ const s = hole.size/2; if(mx>=hole.x-s && mx<=hole.x+s && my>=hole.y-s && my<=hole.y+s){ hole.entity.onHit(this); return; } } } this.lives--; if(this.lives<=0) this.end(); this.updateUI(); }
-  spawnEntity(){ const empty = this.holes.filter(h=>!h.entity); if(empty.length===0) return; const hole = empty[Math.floor(Math.random()*empty.length)]; const r=Math.random(); if(r<0.80) hole.entity = new Mole(hole,'normal'); else if(r<0.95) hole.entity = new PowerUp(hole); else hole.entity = new GoldenMole(hole); }
-  update(dt){ for(const h of this.holes) if(h.entity) h.entity.update(dt,this); this.spawnTimer += dt; if(this.spawnTimer > this.spawnInterval){ this.spawnTimer =0; this.spawnEntity(); } }
-  render(){ const ctx=this.ctx; ctx.clearRect(0,0,this.canvas.width,this.canvas.height); for(const h of this.holes) h.render(ctx); }
-  loop(ts){ if(!this._last) this._last=ts; const dt = ts - this._last; this._last = ts; if(this.running){ this.update(dt); this.render(); requestAnimationFrame(this.loop); } }
-  updateUI(){ document.getElementById('score').textContent = this.score; document.getElementById('lives').textContent = this.lives; document.getElementById('high').textContent = this.high; }
-}
-
+// Embedded minimal OOP Whack-a-Mole implementation
+class Entity { constructor(hole, lifetime=1500){ this.hole = hole; this.life = lifetime; this.spawnTime = Date.now(); } update(dt, game){ if (Date.now() - this.spawnTime > this.life) this.expire(game); } render(ctx,x,y,size){} onHit(game){ this.expire(game); } expire(game){ if (this.hole) this.hole.entity = null; } }
+class Mole extends Entity { constructor(hole,type='normal'){ super(hole,1400); this.type=type; this.points = (type==='normal'?10:50); } render(ctx,x,y,size){ ctx.fillStyle=(this.type==='normal'?'#6b3':'#36f'); ctx.beginPath(); ctx.arc(x,y,size*0.4,0,Math.PI*2); ctx.fill(); } onHit(game){ game.addScore(this.points); if (this.type==='blue') game.speedUp(); super.onHit(game); } }
+class GoldenMole extends Mole{ constructor(hole){ super(hole,'gold'); this.points = 20; } render(ctx,x,y,size){ ctx.fillStyle='gold'; ctx.beginPath(); ctx.arc(x,y,size*0.45,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#333'; ctx.fillText('★', x-6, y+6); } onHit(game){ game.addScore(this.points*2); super.onHit(game); } }
+class PowerUp extends Entity{ constructor(hole){ super(hole,1000); } render(ctx,x,y,size){ ctx.fillStyle='#ff6'; ctx.fillRect(x-size*0.35,y-size*0.35,size*0.7,size*0.7); } onHit(game){ game.addScore(25); game.addLife(); super.onHit(game); } }
+class Hole{ constructor(x,y,size){ this.x=x; this.y=y; this.size=size; this.entity=null; } render(ctx){ ctx.fillStyle='#443'; ctx.beginPath(); ctx.ellipse(this.x,this.y,this.size*0.48,this.size*0.28,0,0,Math.PI*2); ctx.fill(); if(this.entity) this.entity.render(ctx,this.x,this.y,this.size); } }
+class Game{ constructor(canvasId){ this.canvas = document.getElementById(canvasId); this.ctx = this.canvas.getContext('2d'); this.rows = 3; this.cols = 3; this.holes = []; this.score=0; this.lives=3; this.running=false; this.spawnTimer=0; this.spawnInterval=800; this.speedMultiplier=1; this.high = parseInt(localStorage.getItem('whackHigh'))||0; this.setupGrid(); this.bind(); this.updateUI(); this.loop = this.loop.bind(this); } setupGrid(){ const w=this.canvas.width, h=this.canvas.height; const size=Math.min(w,h)/this.rows; for(let r=0;r<this.rows;r++){ for(let c=0;c<this.cols;c++){ let x = (c+0.5)*size; let y=(r+0.5)*size; this.holes.push(new Hole(x,y,size)); } } } bind(){ this.canvas.addEventListener('click', e=>{ const rect=this.canvas.getBoundingClientRect(); const mx=e.clientX-rect.left, my=e.clientY-rect.top; this.handleClick(mx,my); }); document.getElementById('startBtn').addEventListener('click', ()=>this.start()); } start(){ this.score=0; this.lives=3; this.running=true; this.spawnTimer=0; this.spawnInterval=800; requestAnimationFrame(this.loop); this.updateUI(); } end(){ this.running=false; localStorage.setItem('whackHigh', Math.max(this.high,this.score)); let arr = JSON.parse(localStorage.getItem('whackLast'))||[]; arr.unshift(this.score); arr = arr.slice(0,5); localStorage.setItem('whackLast', JSON.stringify(arr)); this.high = Math.max(this.high,this.score); this.updateUI(); alert('Game over — score: '+this.score); } addScore(n){ this.score += n; if(this.score>this.high) this.high=this.score; this.updateUI(); } addLife(){ this.lives++; this.updateUI(); } speedUp(){ this.spawnInterval = Math.max(300, this.spawnInterval - 80); } handleClick(mx,my){ for(const hole of this.holes){ if(hole.entity){ const s = hole.size/2; if(mx>=hole.x-s && mx<=hole.x+s && my>=hole.y-s && my<=hole.y+s){ hole.entity.onHit(this); return; } } } this.lives--; if(this.lives<=0) this.end(); this.updateUI(); } spawnEntity(){ const empty = this.holes.filter(h=>!h.entity); if(empty.length===0) return; const hole = empty[Math.floor(Math.random()*empty.length)]; const r=Math.random(); if(r<0.80) hole.entity = new Mole(hole,'normal'); else if(r<0.95) hole.entity = new PowerUp(hole); else hole.entity = new GoldenMole(hole); } update(dt){ for(const h of this.holes) if(h.entity) h.entity.update(dt,this); this.spawnTimer += dt; if(this.spawnTimer > this.spawnInterval){ this.spawnTimer =0; this.spawnEntity(); } } render(){ const ctx=this.ctx; ctx.clearRect(0,0,this.canvas.width,this.canvas.height); for(const h of this.holes) h.render(ctx); } loop(ts){ if(!this._last) this._last=ts; const dt = ts - this._last; this._last = ts; if(this.running){ this.update(dt); this.render(); requestAnimationFrame(this.loop); } } updateUI(){ document.getElementById('score').textContent = this.score; document.getElementById('lives').textContent = this.lives; document.getElementById('high').textContent = this.high; } }
 // instantiate
 const game = new Game('gameCanvas');
 window._whack = game;
-</script>
-
