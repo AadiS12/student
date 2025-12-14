@@ -38,7 +38,7 @@ Hi! My name is Aadi Saini
             Snake Game
         </div>
     </a>
-    <a href="{{site.baseurl}}/hacks/whackamole" style="text-decoration: none;">
+    <a href="{{site.baseurl}}/hacks/whackamole.html" style="text-decoration: none;">
         <div style="background-color: #00BFFF; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
             Whack-a-Mole
         </div>
