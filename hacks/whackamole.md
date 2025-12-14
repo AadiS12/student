@@ -108,7 +108,7 @@ class Game{
     this.canvas = document.getElementById(canvasId); this.ctx = this.canvas.getContext('2d');
     this.rows = 4; this.cols = 4; this.holes = []; this.score=0; this.lives=3; this.running=false; this.spawnTimer=0; this.spawnInterval=900; this.high = parseInt(localStorage.getItem('whackHigh'))||0; this.level='medium';
     this.setupGrid(); this.bind(); this.updateUI(); this.loop = this.loop.bind(this);
-    this.initAudio();
+    this.loadAssets(); this.initAudio(); this.ensureAudioFiles();
   }
   initAudio(){ try{ const ac = new (window.AudioContext||window.webkitAudioContext)(); this.ac = ac; }catch(e){ this.ac = null; } }
   playTone(freq,dur, type='sine'){ if(!this.ac) return; const o = this.ac.createOscillator(); const g = this.ac.createGain(); o.type = type; o.frequency.value = freq; o.connect(g); g.connect(this.ac.destination); g.gain.value = 0.0001; o.start(); g.gain.exponentialRampToValueAtTime(0.2, this.ac.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, this.ac.currentTime + dur/1000); o.stop(this.ac.currentTime + dur/1000 + 0.02); }
@@ -172,9 +172,10 @@ class Game{
   }
   update(dt){ for(const h of this.holes) if(h.entity) h.entity.update(dt,this); this.spawnTimer += dt; if(this.spawnTimer > this.spawnInterval){ this.spawnTimer =0; this.spawnEntity(); } }
   render(){ const ctx=this.ctx; // grass background
-    ctx.fillStyle = '#8fc46a'; ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
-    // subtle grass texture
-    ctx.fillStyle = 'rgba(255,255,255,0.02)'; for(let i=0;i<80;i++){ ctx.beginPath(); const x=Math.random()*this.canvas.width, y=Math.random()*this.canvas.height; ctx.ellipse(x,y,2,6,Math.random()*Math.PI,0,Math.PI*2); ctx.fill(); }
+    // background: use grass tile if available
+    const gimg = this.assets && this.assets.grass;
+    if(gimg && gimg.complete){ const pat = ctx.createPattern(gimg,'repeat'); if(pat){ ctx.fillStyle = pat; ctx.fillRect(0,0,this.canvas.width,this.canvas.height); } }
+    else { ctx.fillStyle = '#8fc46a'; ctx.fillRect(0,0,this.canvas.width,this.canvas.height); ctx.fillStyle = 'rgba(255,255,255,0.02)'; for(let i=0;i<80;i++){ ctx.beginPath(); const x=Math.random()*this.canvas.width, y=Math.random()*this.canvas.height; ctx.ellipse(x,y,2,6,Math.random()*Math.PI,0,Math.PI*2); ctx.fill(); } }
     for(const h of this.holes) h.render(ctx);
   }
   loop(ts){ if(!this._last) this._last=ts; const dt = ts - this._last; this._last = ts; if(this.running){ this.update(dt); this.render(); requestAnimationFrame(this.loop); } }
