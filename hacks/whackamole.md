@@ -108,7 +108,11 @@ class Game{
     this.canvas = document.getElementById(canvasId); this.ctx = this.canvas.getContext('2d');
     this.rows = 4; this.cols = 4; this.holes = []; this.score=0; this.lives=3; this.running=false; this.spawnTimer=0; this.spawnInterval=900; this.high = parseInt(localStorage.getItem('whackHigh'))||0; this.level='medium';
     this.setupGrid(); this.bind(); this.updateUI(); this.loop = this.loop.bind(this);
+    // sensible defaults
+    this.defaultLife = 1200;
     this.loadAssets(); this.initAudio(); this.ensureAudioFiles();
+    // initial render so grid is visible before starting
+    this.render();
   }
   initAudio(){ try{ const ac = new (window.AudioContext||window.webkitAudioContext)(); this.ac = ac; }catch(e){ this.ac = null; } }
   playTone(freq,dur, type='sine'){ if(!this.ac) return; const o = this.ac.createOscillator(); const g = this.ac.createGain(); o.type = type; o.frequency.value = freq; o.connect(g); g.connect(this.ac.destination); g.gain.value = 0.0001; o.start(); g.gain.exponentialRampToValueAtTime(0.2, this.ac.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, this.ac.currentTime + dur/1000); o.stop(this.ac.currentTime + dur/1000 + 0.02); }
@@ -133,9 +137,11 @@ class Game{
   }
   loadAssets(){
     this.assets = {};
-    const base = '/assets/images/';
+    // use workspace-relative assets path; also re-render when each image loads
+    const base = (document.baseURI || window.location.pathname).replace(/\/[^/]*$/, '');
+    const inferredBase = base.endsWith('/') ? base + 'assets/images/' : base + '/assets/images/';
     const map = { mole: 'mole.svg', blueMole: 'blue-mole.svg', bomb: 'bomb.svg', grass: 'grass-tile.svg' };
-    for(const k in map){ const img = new Image(); img.src = base + map[k]; this.assets[k] = img; }
+    for(const k in map){ const img = new Image(); img.onload = ()=> this.render(); img.onerror = ()=> this.render(); img.src = inferredBase + map[k]; this.assets[k] = img; }
   }
   bind(){
     this.canvas.addEventListener('click', e=>{ const rect=this.canvas.getBoundingClientRect(); const mx=e.clientX-rect.left, my=e.clientY-rect.top; this.handleClick(mx,my); });
