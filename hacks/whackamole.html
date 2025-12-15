@@ -44,7 +44,7 @@
 
   class PowerUp extends Entity{
     constructor(hole){ super(hole,1000); }
-    // PowerUp removed to avoid yellow-square visuals
+    render(ctx,x,y,size){ ctx.fillStyle='#ff6'; ctx.fillRect(x-size*0.35,y-size*0.35,size*0.7,size*0.7); }
     onHit(game){ game.addScore(25); game.addLife(); super.onHit(game); }
   }
 
@@ -70,7 +70,7 @@
     speedUp(){ this.spawnInterval = Math.max(300, this.spawnInterval - 80); }
     handleClick(mx,my){ for(const hole of this.holes){ if(hole.entity){ const s = hole.size/2; if(mx>=hole.x-s && mx<=hole.x+s && my>=hole.y-s && my<=hole.y+s){ hole.entity.onHit(this); return; } } } // miss: penalty
       this.lives--; if(this.lives<=0) this.end(); this.updateUI(); }
-    spawnEntity(){ const empty = this.holes.filter(h=>!h.entity); if(empty.length===0) return; const hole = empty[Math.floor(Math.random()*empty.length)]; const r=Math.random(); if(r<0.85) hole.entity = new Mole(hole,'normal'); else hole.entity = new GoldenMole(hole); }
+    spawnEntity(){ const empty = this.holes.filter(h=>!h.entity); if(empty.length===0) return; const hole = empty[Math.floor(Math.random()*empty.length)]; const r=Math.random(); if(r<0.80) hole.entity = new Mole(hole,'normal'); else if(r<0.95) hole.entity = new PowerUp(hole); else hole.entity = new GoldenMole(hole); }
     update(dt){ // update entities
       for(const h of this.holes) if(h.entity) h.entity.update(dt,this);
       // spawn logic
