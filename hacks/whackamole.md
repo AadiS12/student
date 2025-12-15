@@ -84,11 +84,7 @@ class Bomb extends Entity {
     super.onHit(game); game.lives -= 2; if (game.lives<=0) game.end(); game.updateUI(); game.playBomb(); }
 }
 
-class PowerUp extends Entity{
-  constructor(hole){ super(hole,1000); }
-  render(ctx,x,y,size){ ctx.save(); ctx.translate(x,y); ctx.fillStyle='#ffeb3b'; ctx.fillRect(-size*0.25,-size*0.25,size*0.5,size*0.5); ctx.restore(); }
-  onHit(game){ game.addScore(25); game.addLife(); super.onHit(game); game.playHit(); }
-}
+// Power-ups removed: no visual squares will be spawned
 
 class Hole{
   constructor(x,y,size,game){ this.x=x; this.y=y; this.size=size; this.entity=null; this.game = game; }
@@ -137,9 +133,8 @@ class Game{
   }
   loadAssets(){
     this.assets = {};
-    // use workspace-relative assets path; also re-render when each image loads
-    const base = (document.baseURI || window.location.pathname).replace(/\/[^/]*$/, '');
-    const inferredBase = base.endsWith('/') ? base + 'assets/images/' : base + '/assets/images/';
+    // prefer host-absolute assets path so static hosts resolve correctly
+    const inferredBase = '/student/assets/images/';
     const map = { mole: 'mole.svg', blueMole: 'blue-mole.svg', bomb: 'bomb.svg', grass: 'grass-tile.svg' };
     for(const k in map){ const img = new Image(); img.onload = ()=> this.render(); img.onerror = ()=> this.render(); img.src = inferredBase + map[k]; this.assets[k] = img; }
   }
@@ -151,8 +146,8 @@ class Game{
     const gridEl = document.getElementById('gridSelect');
     if(gridEl){
       gridEl.addEventListener('change', (e)=>{ const v = parseInt(e.target.value,10) || 4; this.rows = v; this.cols = v; this.setupGrid(); this.render(); });
-      // initialize selection value into game
-      const initial = parseInt(gridEl.value,10) || 4; this.rows = initial; this.cols = initial; this.setupGrid();
+      // initialize selection value into game and reflect UI
+      const initial = parseInt(gridEl.value,10) || 4; this.rows = initial; this.cols = initial; this.setupGrid(); this.render();
     }
   }
   start(){ // configure by level
@@ -160,8 +155,21 @@ class Game{
     else if(this.level==='medium'){ this.spawnInterval=900; this.lives=4; this.defaultLife=1200; }
     else { this.spawnInterval=600; this.lives=3; this.defaultLife=900; }
     this.score=0; this.running=true; this.spawnTimer=0; this.updateUI(); this.setupGrid(); requestAnimationFrame(this.loop);
+    // fallback periodic spawn to avoid relying solely on RAF timing
+    if(this._spawnIntervalId) clearInterval(this._spawnIntervalId);
+    this._spawnIntervalId = setInterval(()=>{ if(this.running) this.spawnEntity(); }, Math.max(250, Math.floor(this.spawnInterval/2)));
   }
-  end(){ this.running=false; localStorage.setItem('whackHigh', Math.max(this.high,this.score)); let arr = JSON.parse(localStorage.getItem('whackLast'))||[]; arr.unshift(this.score); arr = arr.slice(0,5); localStorage.setItem('whackLast', JSON.stringify(arr)); this.high = Math.max(this.high,this.score); this.updateUI(); this.playGameOver(); setTimeout(()=>alert('Game over — score: '+this.score),50); }
+  end(){
+    this.running=false;
+    // save highs and recent scores
+    localStorage.setItem('whackHigh', Math.max(this.high,this.score));
+    let arr = JSON.parse(localStorage.getItem('whackLast'))||[]; arr.unshift(this.score); arr = arr.slice(0,5); localStorage.setItem('whackLast', JSON.stringify(arr));
+    this.high = Math.max(this.high,this.score); this.updateUI();
+    // stop the periodic spawner if present
+    if(this._spawnIntervalId){ clearInterval(this._spawnIntervalId); this._spawnIntervalId = null; }
+    this.playGameOver();
+    setTimeout(()=>alert('Game over — score: '+this.score),50);
+  }
   addScore(n){ this.score += n; if(this.score>this.high) this.high=this.score; this.updateUI(); }
   addLife(){ this.lives++; this.updateUI(); }
   speedUp(){ this.spawnInterval = Math.max(250, this.spawnInterval - 80); }
@@ -169,11 +177,10 @@ class Game{
     // miss penalty
     this.lives--; if(this.lives<=0) this.end(); this.updateUI(); }
   spawnEntity(){ const empty = this.holes.filter(h=>!h.entity); if(empty.length===0) return; const hole = empty[Math.floor(Math.random()*empty.length)]; const r=Math.random();
-    // probabilities: normal 0.7, blue 0.12, powerup 0.08, golden 0.06, bomb 0.04
-    if(r < 0.70){ hole.entity = new Mole(hole,'brown'); hole.entity.life = this.defaultLife; }
-    else if(r < 0.82){ hole.entity = new Mole(hole,'blue'); hole.entity.life = this.defaultLife * 1.0; }
-    else if(r < 0.90){ hole.entity = new PowerUp(hole); }
-    else if(r < 0.96){ hole.entity = new Mole(hole,'gold'); hole.entity.points = 30; }
+    // probabilities (power-ups removed): normal, blue, golden, bomb
+    if(r < 0.72){ hole.entity = new Mole(hole,'brown'); hole.entity.life = this.defaultLife; }
+    else if(r < 0.84){ hole.entity = new Mole(hole,'blue'); hole.entity.life = this.defaultLife; }
+    else if(r < 0.94){ hole.entity = new Mole(hole,'gold'); hole.entity.points = 30; }
     else { hole.entity = new Bomb(hole); }
   }
   update(dt){ for(const h of this.holes) if(h.entity) h.entity.update(dt,this); this.spawnTimer += dt; if(this.spawnTimer > this.spawnInterval){ this.spawnTimer =0; this.spawnEntity(); } }
