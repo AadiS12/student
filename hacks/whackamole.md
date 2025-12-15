@@ -84,11 +84,7 @@ class Bomb extends Entity {
     super.onHit(game); game.lives -= 2; if (game.lives<=0) game.end(); game.updateUI(); game.playBomb(); }
 }
 
-class PowerUp extends Entity{
-  constructor(hole){ super(hole,1000); }
-  render(ctx,x,y,size){ ctx.save(); ctx.translate(x,y); ctx.fillStyle='#ffeb3b'; ctx.fillRect(-size*0.25,-size*0.25,size*0.5,size*0.5); ctx.restore(); }
-  onHit(game){ game.addScore(25); game.addLife(); super.onHit(game); game.playHit(); }
-}
+// PowerUp removed by request (no power-ups will spawn)
 
 class Hole{
   constructor(x,y,size,game){ this.x=x; this.y=y; this.size=size; this.entity=null; this.game = game; }
@@ -181,10 +177,9 @@ class Game{
     // miss penalty
     this.lives--; if(this.lives<=0) this.end(); this.updateUI(); }
   spawnEntity(){ const empty = this.holes.filter(h=>!h.entity); if(empty.length===0) return; const hole = empty[Math.floor(Math.random()*empty.length)]; const r=Math.random();
-    // probabilities: normal 0.7, blue 0.12, powerup 0.08, golden 0.06, bomb 0.04
-    if(r < 0.70){ hole.entity = new Mole(hole,'brown'); hole.entity.life = this.defaultLife; }
-    else if(r < 0.82){ hole.entity = new Mole(hole,'blue'); hole.entity.life = this.defaultLife * 1.0; }
-    else if(r < 0.90){ hole.entity = new PowerUp(hole); }
+    // probabilities (power-ups removed): brown, blue, golden, bomb
+    if(r < 0.74){ hole.entity = new Mole(hole,'brown'); hole.entity.life = this.defaultLife; }
+    else if(r < 0.86){ hole.entity = new Mole(hole,'blue'); hole.entity.life = this.defaultLife; }
     else if(r < 0.96){ hole.entity = new Mole(hole,'gold'); hole.entity.points = 30; }
     else { hole.entity = new Bomb(hole); }
   }
