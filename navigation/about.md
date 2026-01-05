@@ -7,10 +7,10 @@ comments: true
 
 ## As a conversation Starter
 
-Here are some places I have lived.
+Here are some of my favorite fruits.
 
 <comment>
-Flags are made using Wikipedia images
+Images are made using Wikipedia images
 </comment>
 
 <style>
@@ -54,42 +54,37 @@ Flags are made using Wikipedia images
 </div>
 
 <script>
-    // 1. Make a connection to the HTML container defined in the HTML div
-    var container = document.getElementById("grid_container"); // This container connects to the HTML div
-
-    // 2. Define a JavaScript object for our http source and our data rows for the Living in the World grid
-    var http_source = "https://upload.wikimedia.org/wikipedia/commons/";
-    var living_in_the_world = [
-        {"flag": "0/01/Flag_of_California.svg", "description": "California - I have lived in California my whole life"},
+    // Build a fruit gallery using local SVG image assets
+    var fruits = [
+        {"name": "Strawberries", "img": "/assets/images/fruits/strawberries.svg", "description": "Sweet and juicy."},
+        {"name": "Oranges", "img": "/assets/images/fruits/oranges.svg", "description": "Great for juice."},
+        {"name": "Grapes", "img": "/assets/images/fruits/grapes.svg", "description": "Perfect for snacking."},
+        {"name": "Bananas", "img": "/assets/images/fruits/bananas.svg", "description": "Great source of energy before physical activity."}
     ];
 
-    // 3a. Consider how to update style count for size of container
-    // The grid-template-columns has been defined as dynamic with auto-fill and minmax
+    var container = document.getElementById("grid_container");
 
-    // 3b. Build grid items inside of our container for each row of data
-    for (const location of living_in_the_world) {
-        // Create a "div" with "class grid-item" for each row
+    for (const fruit of fruits) {
         var gridItem = document.createElement("div");
-        gridItem.className = "grid-item";  // This class name connects the gridItem to the CSS style elements
-        // Add "img" HTML tag for the flag
+        gridItem.className = "grid-item";
+
         var img = document.createElement("img");
-        img.src = http_source + location.flag; // concatenate the source and flag
-        img.alt = location.flag + " Flag"; // add alt text for accessibility
+        img.src = fruit.img;
+        img.alt = fruit.name;
+        img.loading = "lazy";
+        img.style.maxHeight = "100px";
 
-        // Add "p" HTML tag for the description
+        var name = document.createElement("p");
+        name.textContent = fruit.name;
+        name.style.fontWeight = "600";
+
         var description = document.createElement("p");
-        description.textContent = location.description; // extract the description
+        description.textContent = fruit.description;
 
-        // Add "p" HTML tag for the greeting
-        var greeting = document.createElement("p");
-        greeting.textContent = location.greeting;  // extract the greeting
-
-        // Append img and p HTML tags to the grid item DIV
         gridItem.appendChild(img);
+        gridItem.appendChild(name);
         gridItem.appendChild(description);
-        gridItem.appendChild(greeting);
 
-        // Append the grid item DIV to the container DIV
         container.appendChild(gridItem);
     }
 </script>
@@ -101,7 +96,7 @@ Here is what I did at those places
 - 🏫 Went to Design 39 from TK to 5th Grade
 - 🏫 Moved to Oak Valley for middle school and stayed all three years 
 - 🏫 Started high school at Del Norte this year (2025)
-- ⚽ I've played soccer since I was 3 and still do; My favorite activity
+- ⚽ I love playing soccer and have played since I was little
 - 💻🛡️ I joined cyberaegis in 7th grade and still continue doing it (3rd season now)
 
 ### Culture, Family, and Fun
