@@ -58,7 +58,7 @@ Images are made using Wikipedia images
     var fruits = [
         {"name": "Strawberries", "img": "https://upload.wikimedia.org/wikipedia/commons/2/29/PerfectStrawberry.jpg", "description": "Sweet and juicy."},
         {"name": "Oranges", "img": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Orange-Fruit-Pieces.jpg", "description": "Great for juice."},
-        {"name": "Grapes", "img": "https://upload.wikimedia.org/wikipedia/commons/1/14/Red_grapes.jpg", "description": "Perfect for snacking."},
+        {"name": "Grapes", "img": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Close_up_grapes.jpg", "description": "Perfect for snacking."},
         {"name": "Bananas", "img": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg", "description": "Great source of energy before physical activity."}
     ];
 
