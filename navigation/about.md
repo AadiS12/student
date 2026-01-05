@@ -50,7 +50,27 @@ Images are made using Wikipedia images
 
 <!-- This grid_container class is used by CSS styling and the id is used by JavaScript connection -->
 <div class="grid-container" id="grid_container">
-    <!-- content will be added here by JavaScript -->
+    <!-- Static fallback so images appear even when JS is blocked or doesn't run -->
+    <div class="grid-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/PerfectStrawberry.jpg" alt="Strawberries" loading="lazy" />
+        <p style="font-weight:600">Strawberries</p>
+        <p>Sweet and juicy.</p>
+    </div>
+    <div class="grid-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Orange-Fruit-Pieces.jpg" alt="Oranges" loading="lazy" />
+        <p style="font-weight:600">Oranges</p>
+        <p>Great for juice.</p>
+    </div>
+    <div class="grid-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Close_up_grapes.jpg" alt="Grapes" loading="lazy" />
+        <p style="font-weight:600">Grapes</p>
+        <p>Perfect for snacking.</p>
+    </div>
+    <div class="grid-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg" alt="Bananas" loading="lazy" />
+        <p style="font-weight:600">Bananas</p>
+        <p>Great source of energy before physical activity.</p>
+    </div>
 </div>
 
 <script>
