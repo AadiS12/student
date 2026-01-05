@@ -56,10 +56,10 @@ Images are made using Wikipedia images
 <script>
     // Build a fruit gallery using local SVG image assets
     var fruits = [
-        {"name": "Strawberries", "img": "/assets/images/fruits/strawberries.svg", "description": "Sweet and juicy."},
-        {"name": "Oranges", "img": "/assets/images/fruits/oranges.svg", "description": "Great for juice."},
-        {"name": "Grapes", "img": "/assets/images/fruits/grapes.svg", "description": "Perfect for snacking."},
-        {"name": "Bananas", "img": "/assets/images/fruits/bananas.svg", "description": "Great source of energy before physical activity."}
+        {"name": "Strawberries", "img": "https://upload.wikimedia.org/wikipedia/commons/2/29/PerfectStrawberry.jpg", "description": "Sweet and juicy."},
+        {"name": "Oranges", "img": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Orange-Fruit-Pieces.jpg", "description": "Great for juice."},
+        {"name": "Grapes", "img": "https://upload.wikimedia.org/wikipedia/commons/1/14/Red_grapes.jpg", "description": "Perfect for snacking."},
+        {"name": "Bananas", "img": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Banana-Single.jpg", "description": "Great source of energy before physical activity."}
     ];
 
     var container = document.getElementById("grid_container");
